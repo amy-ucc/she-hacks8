@@ -4,11 +4,15 @@ from app.api import bp
 
 from app.controllers.user import User
 from app.controllers.users import Users
+from app.controllers.posts import Posts
+from app.controllers.post import Post  
 
 api = Api(bp)
     
 api.add_resource(Users, '/users/')
 api.add_resource(User, '/user/<int:pk>')
+api.add_resource(Posts, '/posts/')
+api.add_resource(Post, '/post/<int:pk>')
 
 @bp.route('/')
 def index():
