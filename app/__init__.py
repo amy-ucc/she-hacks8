@@ -14,14 +14,14 @@ def create_app(config_class=Config):
     from app.main import bp as main_bp
     app.register_blueprint(main_bp)
 
-    from app.amy import bp as amy_bp
-    app.register_blueprint(amy_bp, url_prefix='/amy')
-
     from app.posts import bp as posts_bp
     app.register_blueprint(posts_bp, url_prefix='/posts')
 
     from app.questions import bp as questions_bp
     app.register_blueprint(questions_bp, url_prefix='/questions')
+
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
 
     @app.route('/test/')
     def test_page():
