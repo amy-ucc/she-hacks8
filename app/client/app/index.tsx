@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Pressable, TextInput, StyleSheet, Image } from 'react-native';
 import { Link } from 'expo-router';
-
-
+  
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -174,3 +173,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+ 

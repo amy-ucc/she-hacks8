@@ -1,84 +1,94 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, Platform } from 'react-native';
+import { View, Text, FlatList, TextInput, StyleSheet, Pressable } from 'react-native';
 import SideNavigationBar from './navbar';
-import { WebView } from 'react-native-webview';
 
-interface Device {
-  id: number;
-  name: string;
-  link: string;
-  online: boolean;
-}
+const ConnectAndExplore = () => {
+  const [posts, setPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const backendBaseUrl = 'http://localhost:8080';
 
-
-const DeviceListScreen = () => {
-  // State to hold the list of devices
-  const [devices, setDevices] = useState<Device[]>([]);
-
-  const isLinkOnline = async (link: string): Promise<boolean> => {
-    try {
-      const response = await fetch(link, { method: 'HEAD' });
-      console.log(`Response for ${link}:`, response);
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  
-
-  // Dummy data for demonstration
   useEffect(() => {
-    const fetchData = async () => {
-      const initialDevices: Device[] = [
-        { id: 1, name: 'Device 1', link: 'http://192.168.2.254:5000/', online: false },
-        { id: 2, name: 'Device 2', link: 'http://localhost:8088/', online: false },
-      ];
-
-      const updatedDevices = await Promise.all(
-        initialDevices.map(async (device) => ({
-          ...device,
-          online: await isLinkOnline(device.link),
-        }))
-      );
-
-      setDevices(updatedDevices);
+    const fetchPosts = async () => {
+      try {
+        const response = await fetch(`${backendBaseUrl}/posts`);
+        const data = await response.json();
+        if (response.ok) {
+          setPosts(data);
+        } else {
+          console.error('Error fetching posts:', data);
+        }
+      } catch (error) {
+        console.error('Error during fetchPosts:', error);
+      }
     };
 
-    fetchData();
+    fetchPosts();
   }, []);
+
+  const selectableTags = ['crochet', 'knitting', 'piano', 'painting', 'hiking'];
+
+  const handleTagPress = (tag) => {
+    setSelectedTags((prevTags) => {
+      if (prevTags.includes(tag)) {
+        // If tag is already selected, remove it
+        return prevTags.filter((selectedTag) => selectedTag !== tag);
+      } else {
+        // If tag is not selected, add it
+        return [...prevTags, tag];
+      }
+    });
+  };
+
+  const filteredPosts = posts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (selectedTags.length === 0 || selectedTags.some((tag) => post.tags.includes(tag)))
+  );
 
   return (
     <View style={styles.screenContainer}>
       <View style={styles.sidebar}>
         <SideNavigationBar />
       </View>
-      <View style={styles.devicesContainer}>
-        <Text style={styles.headerText}>Connected Devices</Text>
+      <View style={styles.mainContent}>
+        <Text style={styles.headerText}>Explore</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search..."
+          onChangeText={(text) => setSearchQuery(text)}
+        />
+        <View style={styles.tagContainer}>
+          {selectableTags.map((tag) => (
+            <Pressable
+              key={tag}
+              style={({ pressed }) => [
+                styles.tag,
+                {
+                  backgroundColor: pressed
+                    ? 'lightgray'
+                    : selectedTags.includes(tag)
+                    ? '#6fa3ef'
+                    : '#aed9ff',
+                },
+              ]}
+              onPress={() => handleTagPress(tag)}
+            >
+              <Text style={styles.tagText}>{tag}</Text>
+            </Pressable>
+          ))}
+        </View>
         <FlatList
-          data={devices}
-          keyExtractor={(device) => device.id.toString()}
-          renderItem={({ item: device }) => (
-            <View style={styles.deviceItemContainer}>
-              <Text style={styles.deviceName}>{device.name}</Text>
-              <Text style={[styles.statusText, { color: device.online ? 'green' : 'red' }]}>
-                {device.online ? 'Online' : 'Offline'}
-              </Text>
-              {device.online && (
-                <View style={styles.linkFeedContainer}>
-                  {Platform.OS === 'web' ? (
-                    <iframe src={device.link} style={styles.linkFeedWebView} />
-                  ) : (
-                    <Image source={{ uri: device.link }} style={styles.linkFeedImage} />
-                  )}
-                </View>
-              )}
+          data={filteredPosts}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <View>
+              <Text>Title: {item.title}</Text>
+              <Text>Content: {item.content}</Text>
+              {/* Add additional fields as needed */}
             </View>
           )}
         />
-        {devices.every((device) => !device.online) && (
-          <Text style={styles.offlineText}>All devices are offline.</Text>
-        )}
       </View>
     </View>
   );
@@ -96,58 +106,36 @@ const styles = StyleSheet.create({
     backgroundColor: '#22354E',
     padding: 10,
   },
-  devicesContainer: {
+  mainContent: {
     flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    padding: 20,
-    marginTop: 20,
+    marginLeft: 10,
   },
   headerText: {
     fontSize: 24,
-    marginBottom: 30,
-    padding: 10,
-    fontWeight: 'bold',
-    alignSelf: 'flex-start',
-  },
-  deviceItemContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    marginBottom: 20,
-    padding: 10,
-  },
-  deviceName: {
-    fontSize: 18,
-    marginBottom: 5,
-    alignSelf: 'flex-start',
-  },
-  statusText: {
-    fontSize: 16,
-    alignSelf: 'flex-start',
-  },
-  linkFeedContainer: {
-    marginTop: 10,
     marginBottom: 10,
-    width: '100%',
-    aspectRatio: 16 / 9,
-    borderRadius: 8,
-    overflow: 'hidden',
   },
-  linkFeedWebView: {
-    flex: 1,
+  searchInput: {
+    height: 30,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
-  linkFeedImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-    borderRadius: 8,
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 10,
   },
-  offlineText: {
-    color: 'red',
-    marginTop: 10,
-    fontSize: 16,
-    alignSelf: 'flex-start',
+  tag: {
+    padding: 5,
+    borderRadius: 5,
+    marginRight: 10,
+    marginBottom: 10,
+  },
+  tagText: {
+    color: 'white',
   },
 });
 
-export default DeviceListScreen;
+export default ConnectAndExplore;

@@ -22,20 +22,20 @@ const SideNavigationBar = () => {
             <Text style={styles.linkText}>Home</Text>
           </TouchableOpacity>
         </Link>
-        <Link href="/devices" asChild>
+        <Link href="/connect" asChild>
           <TouchableOpacity style={styles.linkItem}>
             <View style={styles.iconContainer}>
               <Ionicons name="ios-person" size={20} color="white" />
             </View>
-            <Text style={styles.linkText}>Devices</Text>
+            <Text style={styles.linkText}>Explore</Text>
           </TouchableOpacity>
         </Link>
-        <Link href="/history" asChild>
+        <Link href="/shop" asChild>
           <TouchableOpacity style={styles.linkItem}>
             <View style={styles.iconContainer}>
               <Ionicons name="ios-list" size={20} color="white" />
             </View>
-            <Text style={styles.linkText}>History</Text>
+            <Text style={styles.linkText}>Shop</Text>
           </TouchableOpacity>
         </Link>
         <Link href="/settings" asChild>

@@ -20,7 +20,6 @@ export default function SignupScreen() {
 
   const handleSignup = async () => {
     try {
-      // Check if required fields are empty
       if (!name || !password || !email || !mobile) {
         setSignupError(true);
         return;
@@ -46,7 +45,7 @@ export default function SignupScreen() {
   
       setResponseData(data);
   
-      if (response.ok && data.status === 'success') {
+      if (response.ok && data.success) {
         setSignupError(false);
         setSignedUp(true);
       } else {
@@ -57,6 +56,7 @@ export default function SignupScreen() {
       setSignupError(true);
     }
   };
+  
 
   useEffect(() => {
     if (signedUp) {

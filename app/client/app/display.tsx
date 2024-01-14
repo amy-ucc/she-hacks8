@@ -1,11 +1,3 @@
-/**
- * @file display.tsx
- * @brief The display page for our web application
- * Class: CS3307
- * Date Created: Nov 23
- * Author: Christine.B
- */
-
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
