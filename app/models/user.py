@@ -8,6 +8,7 @@ class User(db.Model):
     password = db.Column(db.String(150))
     achieveVal = db.Column(db.Integer)
     username = db.Column(db.String(150))
+    picture = db.Column(db.String(400))
 
 
     def __repr__(self):
