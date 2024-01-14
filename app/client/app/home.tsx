@@ -17,37 +17,48 @@ import SideNavigationBar from './navbar';
 
 
 export default function HomeScreen() {
-  const [cameraFeedback, setCameraFeedback] = useState<string | null>(null);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-
-  // Address for the Raspberry Pi camera (change when the address to the Pi is added)
-  const ADDRESS = 'http://192.168.2.254:5000/'; // EDIT ME
-
-  // Placeholder until we get the database running fully
-  const connectedDevices = [
-    { id: 1, name: 'Device 1' },
-  ];
-
-
-  const captureFeedback = () => {
-    const feedbackData = ADDRESS; 
-    setCameraFeedback(feedbackData);
+  /**
+   * @brief Handles post upload.
+   */
+  const uploadPost = () => {
+    // Implement post upload logic here
+    // For example, you can open a modal for post creation
+    // and add the created post to the userPosts array.
   };
 
-
-  const viewFeedback = () => {
-    console.log('Viewing camera');
-    openCamera();
+  /**
+   * @brief Displays links to user's posts.
+   */
+  const viewUserPosts = () => {
+    // Implement logic to navigate to a page showing user's posts
+    // You can use navigation libraries like React Navigation for this.
   };
 
-  const openCamera = () => {
-    setIsCameraOpen(true);
+  /**
+   * @brief Displays user's achievements.
+   */
+  const viewAchievements = () => {
+    // Implement logic to show user's achievements
+    // You can use a modal or navigate to a separate page.
   };
 
-
-  const closeCamera = () => {
-    setIsCameraOpen(false);
-  };
+  return (
+    <View style={styles.screenContainer}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>{username}'s Dashboard</Text>
+      </View>
+      {/* ... (existing code) */}
+      <View style={styles.componentContainer}>
+        {/* ... (existing code) */}
+        <View style={styles.actionButtonsContainer}>
+          <Button title="Upload Post" onPress={uploadPost} />
+          <Button title="View Posts" onPress={viewUserPosts} />
+          <Button title="View Achievements" onPress={viewAchievements} />
+        </View>
+      </View>
+    </View>
+  );
+}
 
   return (
     <View style={styles.screenContainer}>
