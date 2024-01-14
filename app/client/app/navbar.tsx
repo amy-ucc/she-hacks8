@@ -1,19 +1,8 @@
-/**
- * @file navbar.tsx
- * @brief The navigation bar for our web application
- * Class: CS3307
- * Date Created: Nov 4, 2023
- * Author: Christine B.
-*/
-
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
  
-/**
- * @brief Functional component representing the side navigation bar.
- */
 const SideNavigationBar = () => {
   return (
     <View style={styles.container}>
