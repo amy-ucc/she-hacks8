@@ -5,9 +5,9 @@ import SideNavigationBar from './navbar';
 
 export default function HomeScreen() {
   // User information
-  const [username, setUsername] = useState('User123'); // Replace with actual username
-  const [userPosts, setUserPosts] = useState<string[]>([]); // Array to store user's posts
-  const [achievements, setAchievements] = useState<number>(0); // Number to store user's achievements count
+  const [username, setUsername] = useState('User123'); 
+  const [userPosts, setUserPosts] = useState<string[]>([]); 
+  const [achievements, setAchievements] = useState<number>(0); 
 
   // Replace connectedDevices with mediaDevices
   const [mediaDevices, setMediaDevices] = useState([
@@ -21,14 +21,6 @@ export default function HomeScreen() {
     // Implement post upload logic here
     // For example, you can open a modal for post creation
     // and add the created post to the userPosts array.
-  };
-
-  /**
-   * @brief Displays links to user's posts.
-   */
-  const viewUserPosts = () => {
-    // Implement logic to navigate to a page showing user's posts
-    // You can use navigation libraries like React Navigation for this.
   };
 
   /**
@@ -63,18 +55,17 @@ export default function HomeScreen() {
         <View style={styles.headerContainer}>
           <Text style={styles.headerText}>{username}'s Dashboard</Text>
         </View>
-        <View style={styles.actionButtonsContainer}>
-          <Button title="Upload Post" onPress={uploadPost} />
-        </View>
         <FlatList
-          data={mediaDevices} 
-          keyExtractor={(item) => item.id.toString()}
+          data={userPosts} 
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({ item }) => (
-            <Text style={styles.mediaDeviceItem}>{item.name}</Text>
+            <View style={styles.postContainer}>
+              <Text style={styles.postText}>{item}</Text>
+            </View>
           )}
         />
         <View style={styles.actionButtonsContainer}>
-          <Button title="View Posts" onPress={viewUserPosts} />
+          <Button title="Upload Post" onPress={uploadPost} />
         </View>
         <View style={styles.achievementsContainer}>
           <Text style={styles.achievementsHeader}>Achievements</Text>
@@ -141,6 +132,18 @@ const styles = StyleSheet.create({
     height: 100, 
     resizeMode: 'contain',
     marginBottom: 5,
+  },
+  postContainer: {
+    backgroundColor: 'white',
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  postText: {
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
 

@@ -1,85 +1,71 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, Image, StyleSheet, Modal, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, FlatList, Image, StyleSheet, TextInput, Pressable, Dimensions } from 'react-native';
 import SideNavigationBar from './navbar';
-import { WebView } from 'react-native-webview';
-import { WebViewSource } from 'react-native-webview/lib/WebViewTypes';
 
-interface HistoryItem {
-  id: number;
-  link: string;
-  status: string;
-  timestamp: string;
-}
+const Shop = () => {
+  const shopData = [
+    {
+      id: 5,
+      userid: 'billy3',
+      title: 'Old Needles',
+      attachment: 'https://i.etsystatic.com/8276294/r/il/7c2d39/3309421459/il_fullxfull.3309421459_jzbj.jpg',
+      description: '10/10 would recommend.',
+      tags: ['knitting'],
+      date: '2022-01-11',
+    },
+    {
+      id: 2,
+      userid: 'SadPianoMan',
+      title: 'Piano Music Sheet',
+      attachment: 'https://i.pinimg.com/originals/80/72/1e/80721eb348fe33024fd3d3fe9f5da1f7.png',
+      description: 'Sheet music for a beautiful piano composition.',
+      tags: ['piano'],
+      date: '2022-01-14',
+    },
+    {
+      id: 3,
+      userid: 'soccerFanatic',
+      title: 'Used Soccerball',
+      attachment: 'https://th.bing.com/th/id/R.49a92cf2ea5338da085b060ae41f63cd?rik=ODQC8gc8YsznVw&pid=ImgRaw&r=0',
+      description: 'A soccer ball with signs of use, perfect for soccer enthusiasts.',
+      tags: ['soccer'],
+      date: '2022-01-13',
+    },
+    {
+      id: 4,
+      userid: 'craftyHands',
+      title: 'Crochet and Knitting Yarn',
+      attachment: 'https://www.lemondedesucrette.com/wp-content/uploads/2014/04/4.jpg',
+      description: 'High-quality yarn for crochet and knitting projects.',
+      tags: ['crochet', 'knitting'],
+      date: '2022-01-12',
+    },
+  ];
 
-const HistoryScreen = () => {
-  const [historyData, setHistoryData] = useState<HistoryItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [items, setItems] = useState(shopData);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+  const backendBaseUrl = 'http://localhost:8080';
 
   useEffect(() => {
-    const fetchData = async () => {
-      const fetchedHistory: HistoryItem[] = [
-        { id: 1, link: 'http://192.168.2.254:5000/', status: 'Uploaded', timestamp: getCurrentTimestamp() }
-      ];
-
-      // Update the timestamp every second
-      const intervalId = setInterval(() => {
-        const updatedHistory = fetchedHistory.map(item => ({
-          ...item,
-          timestamp: getCurrentTimestamp(),
-        }));
-        setHistoryData(updatedHistory);
-      }, 1000);
-
-      setHistoryData(fetchedHistory);
-
-      // Cleanup the interval on component unmount
-      return () => clearInterval(intervalId);
-    };
-
-    const getCurrentTimestamp = () => {
-      const now = new Date();
-      const formattedTimestamp = `${now.getFullYear()}-${padZero(now.getMonth() + 1)}-${padZero(now.getDate())} ${padZero(now.getHours())}:${padZero(now.getMinutes())} ${now.getHours() >= 12 ? 'PM' : 'AM'}`;
-      return formattedTimestamp;
-    };
-
-    const padZero = (num: number) => (num < 10 ? `0${num}` : `${num}`);
-
-    fetchData(); 
+    // Add any additional logic for fetching data from the backend if needed
   }, []);
 
-  const openModal = (item: HistoryItem) => {
-    setSelectedItem(item);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const renderHistoryItemText = () => (
-    <View style={styles.textContainer}>
-      <Text>Status: {selectedItem?.status}</Text>
-      <Text>Timestamp: {selectedItem?.timestamp}</Text>
-    </View>
+  const filteredItems = items.filter(
+    (item) =>
+      (item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))) &&
+      (selectedTags.length === 0 || selectedTags.some((tag) => item.tags.includes(tag)))
   );
-  
-  const renderHistoryItem = ({ item }: { item: HistoryItem }) => (
-    <TouchableOpacity onPress={() => openModal(item)}>
-      <View style={styles.historyItemContainer}>
-        {Platform.OS === 'web' ? (
-          <iframe src={item.link} height={'100%'} width={'100%'} />
-        ) : (
-          <Image source={{ uri: item.link }} style={styles.historyItemImage} />
-        )}
-        {(!isModalOpen || Platform.OS === 'web') && (
-          <View style={styles.textContainer}>
-            <Text>Status: {item.status}</Text>
-            <Text>Timestamp: {item.timestamp}</Text>
-          </View>
-        )}
-      </View>
-    </TouchableOpacity>
+
+  const renderItem = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <Text style={styles.itemTitle}>{item.title}</Text>
+      <Text style={styles.itemUserId}>{`User ID: ${item.userid}`}</Text>
+      <Image source={{ uri: item.attachment }} style={styles.itemImage} />
+      <Text style={styles.itemUserId}>{item.description}</Text>
+    </View>
   );
 
   return (
@@ -87,41 +73,52 @@ const HistoryScreen = () => {
       <View style={styles.sidebar}>
         <SideNavigationBar />
       </View>
-      <View style={styles.historyContainer}>
+      <View style={styles.mainContainer}>
+        <Text style={styles.headerText}>Shop</Text>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search..."
+            onChangeText={(text) => setSearchQuery(text)}
+            value={searchQuery}
+          />
+          <View style={styles.tagContainer}>
+            {Array.from(new Set(items.flatMap((item) => item.tags))).map((tag) => (
+              <Pressable
+                key={tag}
+                style={({ pressed }) => [
+                  styles.tagButton,
+                  { backgroundColor: selectedTags.includes(tag) ? 'lightgray' : 'white' },
+                ]}
+                onPress={() => {
+                  setSelectedTags((prevTags) =>
+                    prevTags.includes(tag) ? prevTags.filter((t) => t !== tag) : [...prevTags, tag]
+                  );
+                }}
+              >
+                <Text style={styles.tagButtonText}>{tag}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
         <FlatList
-          data={historyData}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderHistoryItem}
+          data={filteredItems}
+          keyExtractor={(item) => `${item.id}`}
+          renderItem={renderItem}
+          numColumns={2}
+          columnWrapperStyle={styles.columnWrapper}
         />
       </View>
-      {isModalOpen && (
-        <Modal animationType="slide" transparent={false} visible={isModalOpen}>
-          <View style={styles.modalContainer}>
-            {Platform.OS === 'web' ? (
-              <iframe src={selectedItem?.link} height={'100%'} width={'100%'} />
-            ) : (
-              <>
-                <Image source={{ uri: selectedItem?.link }} style={styles.webView} />
-                <View style={{ marginTop: 10 }}>
-                  <Text>Status: {selectedItem?.status}</Text>
-                  <Text>Timestamp: {selectedItem?.timestamp}</Text>
-                </View>
-              </>
-            )}
-            <TouchableOpacity onPress={closeModal} style={styles.closeModalButton}>
-              <Text style={styles.closeModalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
-      )}
     </View>
   );
 };
 
+const windowHeight = Dimensions.get('window').height;
 
 const styles = StyleSheet.create({
   screenContainer: {
-    width: '100%',
+    width: '95%',
+    height: windowHeight,
     flex: 1,
     flexDirection: 'row',
     margin: 20,
@@ -132,59 +129,80 @@ const styles = StyleSheet.create({
     backgroundColor: '#22354E',
     padding: 10,
   },
-  historyContainer: {
+  mainContainer: {
     flex: 1,
-    padding: 20,
-    width: '60%', 
-    height: '100%', 
+    flexDirection: 'column',
+    padding: 5,
   },
-  historyItemContainer: {
-    marginBottom: 20,
-    backgroundColor: 'white',
-    borderRadius: 8,
+  headerText: {
+    fontSize: 24,
+    marginBottom: 10,
     padding: 10,
-    shadowColor: 'rgba(0, 0, 0, 0.1)',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 5,
-    width: '60%',  
-    flexDirection: 'column', 
-    alignItems: 'center', 
+    fontWeight: 'bold',
+    alignSelf: 'flex-start',
   },
-  historyItemImage: {
-    width: '100%',
-    height: '60%',
-    resizeMode: 'cover',
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 10,
   },
-  textContainer: {
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  webView: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  closeModalButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'red',
-    padding: 8,
+  searchInput: {
+    width: '60%',
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
     borderRadius: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
-  closeModalButtonText: {
-    color: 'white',
+  tagContainer: {
+    flexDirection: 'row',
+    marginLeft: 10,
+  },
+  tagButton: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  tagButtonText: {
+    color: 'blue',
+  },
+  itemContainer: {
+    width: '25%', 
+    aspectRatio: 1,
+    backgroundColor: 'white',
+    padding: 10,
+    margin: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    justifyContent: 'space-between',
+  },
+  itemImage: {
+    width: '100%',
+    height: '70%',
+    borderRadius: 10,
+    marginBottom: 5,
+  },
+  itemTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 5,
+  },
+  itemUserId: {
     fontSize: 12,
-    padding: 2,
+    color: '#555',
+  },
+  columnWrapper: {
+
+  },
+  dynamicTag: {
+    backgroundColor: 'lightgray',
+    padding: 5,
+    borderRadius: 5,
+    marginRight: 5,
   },
 });
 
-export default HistoryScreen;
+export default Shop;
