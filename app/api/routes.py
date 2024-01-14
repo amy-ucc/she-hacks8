@@ -2,23 +2,13 @@ from flask import render_template, Flask, jsonify
 from flask_restful import Resource, Api
 from app.api import bp
 
+from app.controllers.user import User
+from app.controllers.users import Users
+
 api = Api(bp)
-
-fakeDatabase = {
-    1:{'name':'Clean car'},
-    2:{'name':'Write blog'},
-    3:{'name':'Start stream'},
-}
-class Items(Resource):
-    def get(self):
-        return fakeDatabase
-
-class Item(Resource):
-    def get(self, pk):
-        return fakeDatabase[pk]
     
-api.add_resource(Items, '/items/')
-api.add_resource(Item, '/item/<int:pk>')
+api.add_resource(Users, '/users/')
+api.add_resource(User, '/user/<int:pk>')
 
 @bp.route('/')
 def index():
